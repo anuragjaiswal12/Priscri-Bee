@@ -1,0 +1,97 @@
+.doctor-login,
+.patient-login{
+    justify-content: center;
+}
+
+.login__container{
+    height: 400px;
+    width: 700px;
+    display: flex;
+    margin:auto 0;
+    gap:30px;
+}
+.login__card{
+    position: relative;
+    height: 400px;
+    width: 400px;
+    background: var(--bg-elements);
+    border-radius: var(--border-radis);
+    box-shadow:  0  0 2px rgb(181, 181, 181);
+}
+.login__svg{
+    width: 50%;
+    height: 100%;
+    filter: drop-shadow(0 0 1px rgb(202, 202, 202));
+}
+.login--illustrator--doctor{
+    background: url("../assets/Doctor_Login.png") no-repeat bottom center;
+    background-size:contain;
+}
+.login--illustrator--patient{
+    background: url("../assets/Patient_Login.png") no-repeat bottom center;
+    background-size:contain;
+
+}
+.login__form__header{
+    margin-top:30px ;
+    color: var(--main-text-color-d-medium);
+    background: white;
+}
+.login__form{
+    bottom: 50px;
+    position: absolute;
+    padding: 20px;
+    height :260px; 
+    width: 100%;
+}
+.login__input,.login__btn{
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    border-radius: var(--border-radis);
+    margin-block:20px ;
+    height: 45px;
+}
+.login__input{
+    text-indent:10px ;
+}
+.login__btn{
+    font-weight: 700;
+    width: 100px;
+}
+.patient__registration,
+.doctor__registration,
+.login__back__btn{
+    position: absolute;
+    cursor: pointer;
+    transition: cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+}
+.patient__registration,
+.doctor__registration{
+    font-size: 0.9rem;
+    color: var(--main-text-color-l);
+    text-align: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+}
+.patient__registration:hover,
+.doctor__registration:hover,
+.login__back__btn:hover    
+{
+    color: bisque;
+}
+.login__back__btn{
+    font-weight: 600;
+    text-align: center;
+    background: black;
+    color: var(--main-text-color-l);
+    height: 30px;
+    line-height: 30px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin:0 auto;
+}

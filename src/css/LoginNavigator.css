@@ -1,0 +1,65 @@
+.navigator{
+    flex-direction: column;
+    text-align: center;
+}
+.navigator__container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 30px;
+    font-weight: 600;
+    text-shadow: 0 0 10px #00000079;
+}
+.navigator__header{
+    text-shadow: none;
+}
+.login__navigator{
+    border-radius: var(--border-radis);
+    color:var(--main-text-color-l);
+    width: 300px;
+    height: 300px;
+    background: #4F46E5;
+    text-align: center;
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 1s;
+    cursor: pointer;
+    position: relative;
+}
+.login__navigator:hover{
+    transform: scale(1.1);
+}
+.--patient{
+    background: #4F46E5 url("../assets/patient.png") no-repeat bottom center;
+    background-size: contain;
+}
+.--doctor{
+    background: #4F46E5 url("../assets/Doctor.png") no-repeat bottom center;
+    background-size: contain;   
+}
+.--patient::before,.--doctor::before{
+    position: absolute;
+    height: fit-content;
+    text-shadow: none;
+    color: var(--main-text-color-d);
+    background-color: white;
+    left: 0;
+    right: 0;
+    top: 80%;
+    bottom: 0;
+}
+.--patient::before{
+    content: "Patient's Portal";
+}
+.--doctor::before{
+    content: "Doctor's Portal";
+}
+@media (max-width:750px) {
+    .navigator__container{
+        flex-wrap: wrap;
+    }
+    .login__navigator{
+        height: 200px;
+        width: 250px;
+    }
+}
