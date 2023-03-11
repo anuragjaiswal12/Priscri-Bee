@@ -11,7 +11,7 @@ export default function PatientRegistration() {
     firstName: "",
     lastName: "",
     dateOfBirth: null,
-    gender: "",
+    gender: "male",
     bloodGroup: "",
     hypertension: false,
     isDybitic: false,
@@ -30,24 +30,28 @@ export default function PatientRegistration() {
     password: "",
   })
 
-  // Temp State for handleing temp values 
-  // after processing values get stored in registrationData state
-  const stateArray = indianStates.map(item => <option value={item} key={item}>{item}</option>)
-
+  // State for Handeling and Stroing Errors
+  const [registrationErrors, setRegistrationErrors] = useState({});
+  
+  // TempSatate for preprossesing of Cetain Fields
   const [tempData, setTempData] = useState({
     tempAlllergies: "",
-    tempDate: { startDate: new Date() }
+    tempDate: { startDate: new Date() },
+    confirmPassword:""
   })
 
-  function handleTempData(event) {
-    const { name, value } = event.target
-    setTempData(prevData => ({
-      ...prevData, [name]: value
-    }))
-  }
+  // indainSatate array ements into jsx used for select State of Country
+  const stateArray = indianStates.map(item => <option value={item} key={item}>{item}</option>)
 
-  // Function to push allergies array of registrationData
-  const handleAddAllergy = (allergy) => {
+  // Funtion to add get jsx form allergies array registrationData
+  const allergiesArray = registrationData.allergies.map(item =>
+    (<span className="array__elements" key={item}>
+      {item} <i className="fa-solid fa-circle-xmark" onClick={() => removeArrayItem(item)}></i>
+    </span>))
+
+// Function to push elements into allergies array of registrationData
+const handleAddAllergy = (allergy) => {
+  if(allergy){
     setRegistrationData(prevState => {
       return {
         ...prevState,
@@ -56,6 +60,21 @@ export default function PatientRegistration() {
     })
     setTempData(prevData => ({ ...prevData, tempAlllergies: "" }))
   }
+  else{
+    alert("Make Sure You are entering something")
+  }
+}
+  // Funtion to remove elements allergies array registrationData
+  const removeArrayItem = (item) => setRegistrationData(prevData => ({ ...prevData, allergies: prevData.allergies.filter(currItem => currItem != item) }))
+
+  //Funtion to Update state of data on onChange 
+  function handleTempData(event) {
+    const { name, value } = event.target
+    setTempData(prevData => ({
+      ...prevData, [name]: value
+    }))
+  }
+
 
   // Function to update registrationData as it updates
   function handleChange(event) {
@@ -87,10 +106,53 @@ export default function PatientRegistration() {
       return { ...prevData, dateOfBirth: formattedDate }
     })
   }
-  // Handleing Form onSubmit 
-  function handleSubmit(e){
-    e.preventDefault();
 
+  // Handleing Form onSubmit and Validiting
+  function handleSubmit(event) {
+    event.preventDefault()
+    // Validate first name and last name fields (letters only, minimum length of 2)
+    const nameRegex = /^[A-Za-z]{2,}$/
+
+    // Validate phone number field (10 digit Indian mobile number)
+    const phoneRegex = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
+
+    // Validate password field (minimum 8 characters, at least one uppercase letter, one lowercase letter, one special character, and one number)
+    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+
+    //Validates pincode field.
+    const pincodeRegex = /^\d{6}$/    
+
+    const errors = {}
+    setRegistrationErrors({})
+    if (!nameRegex.test(registrationData.firstName)) {
+      errors.firstName = "Enter valid first name"
+    }
+    if (!nameRegex.test(registrationData.lastName)) {
+      errors.lastName = "Enter valid last name"
+    }
+    if (!phoneRegex.test(registrationData.phone)) {
+      errors.lastName = "Enter valid phonr number"
+    }
+  
+    if (registrationData.allergies.length < 1) {
+      errors.allergies = 'Enter at least one allergies'
+    }
+
+    if (!passwordRegex.test(registrationData.password)) {
+      errors.password = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+    }
+    if (!passwordRegex.test(tempData.confirmPassword)) {
+      errors.confirmPassword = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+    }
+    if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
+      errors.confirmPassword = 'Both password should be same'
+    }
+    if (!pincodeRegex.test(registrationData.addreess.pincode)) {
+      errors.pincode = 'Please Enter valid pincode'
+    }
+    console.log(errors)
+    setRegistrationErrors(prevData => ({ ...prevData, ...errors }))
+    console.log(registrationErrors)
   }
   return (
     <div className="patient-registration main-container">
@@ -109,6 +171,7 @@ export default function PatientRegistration() {
             onChange={handleChange}
             required
           />
+          {registrationErrors.firstName && <small className="error--message">{registrationErrors.firstName}</small>}
         </div>
 
         <div>
@@ -122,6 +185,7 @@ export default function PatientRegistration() {
             value={registrationData.lastName}
             required
           />
+          {registrationErrors.lastName && <small className="error--message">{registrationErrors.lastName}</small>}
         </div>
 
         <div>
@@ -205,22 +269,28 @@ export default function PatientRegistration() {
           </select>
         </div>
 
-        <div className="registration__allergies grid--column--extended">
-          <label htmlFor="allergies" className="registration__label">Do You Have any allergies ? If Yes then menction</label>
+        <div className="registration__allergies">
+          <label htmlFor="allergies" className="registration__label">Please Enter your allergies (if have any)</label>
           <input
             type="text"
             name="tempAlllergies"
             id="allergies"
-            className="registration__input input--size--limit"
+            className="registration__input "
             onChange={handleTempData}
             value={tempData.tempAlllergies}
-            required
           />
-          <button type="button"
-            className="registration__btn"
+          {registrationErrors.allergies && <small className="error--message">{registrationErrors.allergies}</small>}
+          {allergiesArray.length > 0 && <div className="registration__expertise__display grid--column--extended">
+            {allergiesArray}
+          </div>}
+        </div>
+        <div className="add-allrgies--btn">
+        <button type="button"
+            className="registration__btn "
             onClick={() => handleAddAllergy(tempData.tempAlllergies)}>Add allergies</button>
         </div>
-        <div>
+        
+        <div className="registration__email__patient">
           <label htmlFor="email" className="registration__label">Email</label>
           <input
             type="email"
@@ -244,6 +314,7 @@ export default function PatientRegistration() {
             value={registrationData.phone}
             required
           />
+          {registrationErrors.phone && <small className="error--message">{registrationErrors.phone}</small>}
 
         </div>
         <div>
@@ -257,21 +328,23 @@ export default function PatientRegistration() {
             value={registrationData.password}
             required
           />
+          {registrationErrors.password && <small className="error--message">{registrationErrors.password}</small>}
 
         </div>
         <div>
 
-          <label htmlFor="confirm_password" className="registration__label">Confirm Password</label>
+          <label htmlFor="confirmPassword" className="registration__label">Confirm Password</label>
           <input
             type="password"
-            name="confirm_password"
+            name="confirmPassword"
             id="confirm_password"
             className="registration__input"
+            onChange={handleTempData}
             required
           />
+          {registrationErrors.confirmPassword && <small className="error--message">{registrationErrors.confirmPassword}</small>}
         </div>
-
-
+      
         {/* Address */}
         <div className="registration____details grid--column--extended registration--address--details"><h2>Address Details :</h2></div>
         <div>
@@ -354,7 +427,7 @@ export default function PatientRegistration() {
         <div>
           <label htmlFor="pincode" className="registration__label">Pincode</label>
           <input
-            type="text"
+            type="numberv"
             name="pincode"
             id="pincode"
             className="registration__input"
@@ -366,8 +439,7 @@ export default function PatientRegistration() {
         <div className="grid--column--extended">
           <button 
             type ="submit" 
-            className="registration__btn btn--submit" 
-            onClick={()=>console.log("submmmited")}>
+            className="registration__btn btn--submit">
               Submit
           </button>
         </div>
