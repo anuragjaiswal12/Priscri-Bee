@@ -5,6 +5,10 @@ import "../../css/Registration.css"
 import { Footer } from "../../Utils/Footer";
 import { indianStates } from "../../Utils/Data";
 import { calculateAge } from "../../Utils/calculateAge";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { auth, db } from '../../auth/firebaseAuth';
+import 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default function PatientRegistration() {
   // main State of an application
@@ -80,55 +84,84 @@ export default function PatientRegistration() {
 
     // Getting age of Doctor
     const age = calculateAge(registrationData.dateOfBirth)
-
+    let flag = true
     const errors = {}
     setRegistrationErrors({})
     if (!nameRegex.test(registrationData.firstName)) {
       errors.firstName = "Enter valid first name"
+      flag = false
     }
     if (!nameRegex.test(registrationData.lastName)) {
       errors.lastName = "Enter valid last name"
+      flag = false
     }
     if (!phoneRegex.test(registrationData.phone)) {
-      errors.lastName = "Enter valid phonr number"
+      errors.phone = "Enter valid phonr number"
+      flag = false
     }
     if (registrationData.qualification === 'Other') {
       if (registrationData.otherQualification.trim() === '') {
         errors.otherQualification = 'Please Enter qualification.'
+        flag = false
       }
     }
     if (age < 18) {
       errors.dateOfBirth = 'Age shoud be 18 or more'
+      flag = false
     }
 
     if (registrationData.areasOfExpertise.length < 1) {
       errors.areasOfExpertise = 'Enter at least one expertise.'
+      flag = false
     }
     if (!passwordRegex.test(registrationData.password)) {
       errors.password = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+      flag = false
     }
     if (!passwordRegex.test(tempData.confirmPassword)) {
       errors.confirmPassword = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+      flag = false
     }
     if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
       errors.confirmPassword = 'Both password should be same'
+      flag = false
     }
     if (!pincodeRegex.test(registrationData.addreess.pincode)) {
       errors.pincode = 'Please Enter valid pincode'
+      flag = false
     }
     console.log(errors)
     setRegistrationErrors(prevData => ({ ...prevData, ...errors }))
     console.log(registrationErrors)
+    if (flag) {
+      createUserWithEmailAndPassword(auth, registrationData.email, registrationData.password)
+        .then(async (res) => {
+          const name = `${registrationData.firstName} ${registrationData.lastName}`;
+          const user = res.user;
+          await updateProfile(user, { displayName: name });
+          const pendingDoctorColletionRef = collection(db, 'pendingDoctorCollection');
+          await addDoc(pendingDoctorColletionRef, registrationData);
+          auth.signOut().then(() => console.log('User Registerd!'));
+        }).catch(err => {
+          if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
+            console.log('This email is already linked with an account.')
+          }
+        });
+    }
   }
   // Function to push allergies array of registrationData
   const handleAddExpertise = (expertise) => {
-    setRegistrationData(prevState => {
-      return {
-        ...prevState,
-        areasOfExpertise: [...prevState.areasOfExpertise, expertise]
-      }
-    })
-    setTempData(prevData => ({ ...prevData, tempAreasOfExpertise: "" }))
+    if (expertise) {
+      setRegistrationData(prevState => {
+        return {
+          ...prevState,
+          areasOfExpertise: [...prevState.areasOfExpertise, expertise]
+        }
+      })
+      setTempData(prevData => ({ ...prevData, tempAreasOfExpertise: "" }))
+    } else {
+      alert("Make sure expertise you are adding is not an empty element.")
+    }
   }
 
   // Function to update registrationData as it updates
@@ -251,7 +284,7 @@ export default function PatientRegistration() {
             value={registrationData.phone}
             required
           />
-
+          {registrationErrors.phone && <small className="error--message">{registrationErrors.phone}</small>}
         </div>
         <div>
           <label htmlFor="workExperience" className="registration__label">Work Experience</label>
@@ -479,7 +512,7 @@ export default function PatientRegistration() {
           <select
             id="state"
             name="state"
-            onChange={handleChange}
+            onChange={handleAddress}
             className="registration__input"
             value={registrationData.addreess.state}
           >
