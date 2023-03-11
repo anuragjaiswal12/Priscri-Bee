@@ -4,6 +4,10 @@ import { useState } from "react";
 import "../../css/Registration.css"
 import { Footer } from "../../Utils/Footer";
 import { indianStates } from "../../Utils/Data";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { auth, db } from '../../auth/firebaseAuth';
+import 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default function PatientRegistration() {
   // main State of an application
@@ -12,7 +16,7 @@ export default function PatientRegistration() {
     lastName: "",
     dateOfBirth: null,
     gender: "male",
-    bloodGroup: "",
+    bloodGroup: "A+",
     hypertension: false,
     isDybitic: false,
     allergies: [],
@@ -32,38 +36,38 @@ export default function PatientRegistration() {
 
   // State for Handeling and Stroing Errors
   const [registrationErrors, setRegistrationErrors] = useState({});
-  
+
   // TempSatate for preprossesing of Cetain Fields
   const [tempData, setTempData] = useState({
     tempAlllergies: "",
     tempDate: { startDate: new Date() },
-    confirmPassword:""
+    confirmPassword: ""
   })
 
-  // indainSatate array ements into jsx used for select State of Country
+  // indainState array ements into jsx used for select State of Country
   const stateArray = indianStates.map(item => <option value={item} key={item}>{item}</option>)
 
   // Funtion to add get jsx form allergies array registrationData
   const allergiesArray = registrationData.allergies.map(item =>
-    (<span className="array__elements" key={item}>
-      {item} <i className="fa-solid fa-circle-xmark" onClick={() => removeArrayItem(item)}></i>
-    </span>))
+  (<span className="array__elements" key={item}>
+    {item} <i className="fa-solid fa-circle-xmark" onClick={() => removeArrayItem(item)}></i>
+  </span>))
 
-// Function to push elements into allergies array of registrationData
-const handleAddAllergy = (allergy) => {
-  if(allergy){
-    setRegistrationData(prevState => {
-      return {
-        ...prevState,
-        allergies: [...prevState.allergies, allergy]
-      }
-    })
-    setTempData(prevData => ({ ...prevData, tempAlllergies: "" }))
+  // Function to push elements into allergies array of registrationData
+  const handleAddAllergy = (allergy) => {
+    if (allergy) {
+      setRegistrationData(prevState => {
+        return {
+          ...prevState,
+          allergies: [...prevState.allergies, allergy]
+        }
+      })
+      setTempData(prevData => ({ ...prevData, tempAlllergies: "" }))
+    }
+    else {
+      alert("Make Sure You are entering something")
+    }
   }
-  else{
-    alert("Make Sure You are entering something")
-  }
-}
   // Funtion to remove elements allergies array registrationData
   const removeArrayItem = (item) => setRegistrationData(prevData => ({ ...prevData, allergies: prevData.allergies.filter(currItem => currItem != item) }))
 
@@ -120,35 +124,54 @@ const handleAddAllergy = (allergy) => {
     const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
 
     //Validates pincode field.
-    const pincodeRegex = /^\d{6}$/    
+    const pincodeRegex = /^\d{6}$/
 
     const errors = {}
     setRegistrationErrors({})
+    let flag = true;
     if (!nameRegex.test(registrationData.firstName)) {
       errors.firstName = "Enter valid first name"
+      flag = false;
     }
     if (!nameRegex.test(registrationData.lastName)) {
       errors.lastName = "Enter valid last name"
+      flag = false;
     }
     if (!phoneRegex.test(registrationData.phone)) {
-      errors.lastName = "Enter valid phonr number"
-    }
-  
-    if (registrationData.allergies.length < 1) {
-      errors.allergies = 'Enter at least one allergies'
+      errors.phone = "Enter valid phonr number"
+      flag = false;
     }
 
     if (!passwordRegex.test(registrationData.password)) {
       errors.password = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+      flag = false;
     }
     if (!passwordRegex.test(tempData.confirmPassword)) {
       errors.confirmPassword = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
+      flag = false;
     }
     if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
       errors.confirmPassword = 'Both password should be same'
+      flag = false;
     }
     if (!pincodeRegex.test(registrationData.addreess.pincode)) {
       errors.pincode = 'Please Enter valid pincode'
+      flag = false;
+    }
+    if (flag) {
+      createUserWithEmailAndPassword(auth, registrationData.email, registrationData.password)
+        .then(async (res) => {
+          const name = `${registrationData.firstName} ${registrationData.lastName}`;
+          const user = res.user;
+          await updateProfile(user, { displayName: name });
+          const peatientColletionRef = collection(db, 'patientCollection');
+          await addDoc(peatientColletionRef, registrationData);
+          auth.signOut().then(() => console.log('User Registerd!'));
+        }).catch(err => {
+          if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
+            console.log('This email is already linked with an account.')
+          }
+        });
     }
     console.log(errors)
     setRegistrationErrors(prevData => ({ ...prevData, ...errors }))
@@ -285,11 +308,11 @@ const handleAddAllergy = (allergy) => {
           </div>}
         </div>
         <div className="add-allrgies--btn">
-        <button type="button"
+          <button type="button"
             className="registration__btn "
             onClick={() => handleAddAllergy(tempData.tempAlllergies)}>Add allergies</button>
         </div>
-        
+
         <div className="registration__email__patient">
           <label htmlFor="email" className="registration__label">Email</label>
           <input
@@ -344,13 +367,13 @@ const handleAddAllergy = (allergy) => {
           />
           {registrationErrors.confirmPassword && <small className="error--message">{registrationErrors.confirmPassword}</small>}
         </div>
-      
+
         {/* Address */}
         <div className="registration____details grid--column--extended registration--address--details"><h2>Address Details :</h2></div>
         <div>
           <label htmlFor="houseNo" className="registration__label">House No</label>
           <input
-            type="text"
+            type="number"
             name="houseNo"
             id="houseNo"
             className="registration__input"
@@ -400,11 +423,11 @@ const handleAddAllergy = (allergy) => {
           />
         </div>
         <div>
-        <label htmlFor="state">Select State</label>
-        <select
+          <label htmlFor="state">Select State</label>
+          <select
             id="state"
             name="state"
-            onChange={handleChange}
+            onChange={handleAddress}
             className="registration__input"
             value={registrationData.addreess.state}
           >
@@ -427,7 +450,7 @@ const handleAddAllergy = (allergy) => {
         <div>
           <label htmlFor="pincode" className="registration__label">Pincode</label>
           <input
-            type="numberv"
+            type="number"
             name="pincode"
             id="pincode"
             className="registration__input"
@@ -435,16 +458,17 @@ const handleAddAllergy = (allergy) => {
             value={registrationData.addreess.pincode}
             required
           />
+          {registrationErrors.pincode && <small className="error--message">{registrationErrors.pincode}</small>}
         </div>
         <div className="grid--column--extended">
-          <button 
-            type ="submit" 
+          <button
+            type="submit"
             className="registration__btn btn--submit">
-              Submit
+            Submit
           </button>
         </div>
       </form>
-      <Footer/>
+      <Footer />
     </div>
   )
 }
