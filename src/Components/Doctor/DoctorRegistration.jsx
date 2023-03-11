@@ -76,7 +76,7 @@ export default function PatientRegistration() {
     const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
 
     //Validates pincode field.
-    const pincodeRegex = /^\d{6}$/    
+    const pincodeRegex = /^\d{6}$/
 
     // Getting age of Doctor
     const age = calculateAge(registrationData.dateOfBirth)
@@ -97,7 +97,7 @@ export default function PatientRegistration() {
         errors.otherQualification = 'Please Enter qualification.'
       }
     }
-    if(age<18){
+    if (age < 18) {
       errors.dateOfBirth = 'Age shoud be 18 or more'
     }
 
@@ -113,7 +113,7 @@ export default function PatientRegistration() {
     if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
       errors.confirmPassword = 'Both password should be same'
     }
-    if (!pincodeRegex.test(registrationData.pincode)) {
+    if (!pincodeRegex.test(registrationData.addreess.pincode)) {
       errors.pincode = 'Please Enter valid pincode'
     }
     console.log(errors)
@@ -278,7 +278,7 @@ export default function PatientRegistration() {
           />
         </div>
         <div>
-        <label htmlFor="dateOfRegistration" className="registration__label">Date Of Registration</label>
+          <label htmlFor="dateOfRegistration" className="registration__label">Date Of Registration</label>
           <DatePicker
             name="tempDateOfRegistration"
             dateFormat="dd/MM/yyyy"
@@ -504,7 +504,7 @@ export default function PatientRegistration() {
         <div>
           <label htmlFor="pincode" className="registration__label">Pincode</label>
           <input
-            type="text"
+            type="number"
             name="pincode"
             id="pincode"
             className="registration__input"
