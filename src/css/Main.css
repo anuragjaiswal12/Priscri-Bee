@@ -50,6 +50,7 @@ body{
 .error--message{
     font-weight: 500;
     color: #ffd2cb;
+    font-size: 0.7rem;
 }
 .width--auto{
     width: auto;

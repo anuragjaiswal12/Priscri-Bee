@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import "../../css/Registration.css"
 import { Footer } from "../../Utils/Footer";
 import { indianStates } from "../../Utils/Data";
+import { calculateAge } from "../../Utils/calculateAge";
 
 export default function PatientRegistration() {
   // main State of an application
@@ -45,7 +46,8 @@ export default function PatientRegistration() {
     tempAlllergies: "",
     tempDate: { startDate: new Date() },
     tempAreasOfExpertise: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    tempDateOfRegistration: { startDate: new Date() }
   })
 
   const removeArrayItem = (item) => setRegistrationData(prevData => ({ ...prevData, areasOfExpertise: prevData.areasOfExpertise.filter(currItem => currItem != item) }))
@@ -65,47 +67,54 @@ export default function PatientRegistration() {
   function handleSubmit(event) {
     event.preventDefault()
     // Validate first name and last name fields (letters only, minimum length of 2)
-    const nameRegex = /^[A-Za-z]{2,}$/;
+    const nameRegex = /^[A-Za-z]{2,}$/
 
     // Validate phone number field (10 digit Indian mobile number)
-    const phoneRegex = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/;
+    const phoneRegex = /^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/
 
     // Validate password field (minimum 8 characters, at least one uppercase letter, one lowercase letter, one special character, and one number)
-    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
 
     //Validates pincode field.
-    const pincodeRegex = /^(\d{4}|\d{6})$/;
+    const pincodeRegex = /^\d{6}$/    
+
+    // Getting age of Doctor
+    const age = calculateAge(registrationData.dateOfBirth)
 
     const errors = {}
     setRegistrationErrors({})
     if (!nameRegex.test(registrationData.firstName)) {
-      errors.firstName = "Please enter valid first name."
+      errors.firstName = "Enter valid first name"
     }
     if (!nameRegex.test(registrationData.lastName)) {
-      errors.lastName = "Please enter valid last name."
+      errors.lastName = "Enter valid last name"
     }
     if (!phoneRegex.test(registrationData.phone)) {
-      errors.lastName = "Please enter valid phonr number."
+      errors.lastName = "Enter valid phonr number"
     }
     if (registrationData.qualification === 'Other') {
       if (registrationData.otherQualification.trim() === '') {
-        errors.otherQualification = 'Please enter qualification.'
+        errors.otherQualification = 'Please Enter qualification.'
       }
     }
+    if(age<18){
+      errors.dateOfBirth = 'Age shoud be 18 or more'
+    }
+
     if (registrationData.areasOfExpertise.length < 1) {
-      errors.areasOfExpertise = 'Please enter at least one expertise.'
+      errors.areasOfExpertise = 'Enter at least one expertise.'
     }
     if (!passwordRegex.test(registrationData.password)) {
-      errors.password = 'Please enter valid password.'
+      errors.password = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
     }
     if (!passwordRegex.test(tempData.confirmPassword)) {
-      errors.confirmPassword = 'Please enter valid password.'
+      errors.confirmPassword = 'Password should be 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one symbol'
     }
     if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
-      errors.confirmPassword = 'Both password should be same.'
+      errors.confirmPassword = 'Both password should be same'
     }
     if (!pincodeRegex.test(registrationData.pincode)) {
-      errors.pincode = 'Please enter valid pincode.'
+      errors.pincode = 'Please Enter valid pincode'
     }
     console.log(errors)
     setRegistrationErrors(prevData => ({ ...prevData, ...errors }))
@@ -153,6 +162,16 @@ export default function PatientRegistration() {
     })
   }
 
+  function handleRegistrationDate(date) {
+    setRegistrationData(prevData => {
+      const formattedDate = date.toLocaleDateString('en-GB');
+      setTempData(prevData => ({
+        ...prevData, tempDateOfRegistration: { startDate: date }
+      }))
+      return { ...prevData, dateOfRegistration: formattedDate }
+    })
+  }
+
   return (
     <div className="patient-registration main-container">
       <form onSubmit={handleSubmit} className="registration-container">
@@ -196,6 +215,8 @@ export default function PatientRegistration() {
             selected={tempData.tempDate.startDate}
             onChange={handleDate}
           />
+          {registrationErrors.dateOfBirth && <small className="error--message">{registrationErrors.dateOfBirth}</small>}
+
         </div>
 
         <div >
@@ -257,14 +278,14 @@ export default function PatientRegistration() {
           />
         </div>
         <div>
-          <label htmlFor="dateOfRegistration" className="registration__label">Date Of Registration</label>
-          <input
-            type="text"
-            name="dateOfRegistration"
-            id="dateOfRegistration"
+        <label htmlFor="dateOfRegistration" className="registration__label">Date Of Registration</label>
+          <DatePicker
+            name="tempDateOfRegistration"
+            dateFormat="dd/MM/yyyy"
             className="registration__input"
-            onChange={handleChange}
-            value={registrationData.dateOfRegistration} />
+            selected={tempData.tempDateOfRegistration.startDate}
+            onChange={handleRegistrationDate}
+          />
         </div>
 
         <div>
