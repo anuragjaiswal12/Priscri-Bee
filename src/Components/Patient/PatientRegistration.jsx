@@ -16,7 +16,7 @@ export default function PatientRegistration() {
     lastName: "",
     dateOfBirth: null,
     gender: "male",
-    bloodGroup: "",
+    bloodGroup: "A+",
     hypertension: false,
     isDybitic: false,
     allergies: [],
