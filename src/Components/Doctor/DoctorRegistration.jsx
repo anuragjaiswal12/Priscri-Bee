@@ -11,7 +11,7 @@ export default function PatientRegistration() {
     firstName: "",
     lastName: "",
     dateOfBirth: new Date(),
-    gender: "",
+    gender: "male",
     registrationNumber: "",
     qualification: "",
     otherQualification: "",
@@ -72,17 +72,43 @@ export default function PatientRegistration() {
 
     // Validate password field (minimum 8 characters, at least one uppercase letter, one lowercase letter, one special character, and one number)
     const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+    //Validates pincode field.
+    const pincodeRegex = /^(\d{4}|\d{6})$/;
+
     const errors = {}
     setRegistrationErrors({})
-    if(!nameRegex.test(registrationData.firstName)){
-      errors.firstName ="Please enter error name"
+    if (!nameRegex.test(registrationData.firstName)) {
+      errors.firstName = "Please enter valid first name."
     }
-    if(!nameRegex.test(registrationData.lastName))
-    {
-      errors.lastName ="OK"
+    if (!nameRegex.test(registrationData.lastName)) {
+      errors.lastName = "Please enter valid last name."
+    }
+    if (!phoneRegex.test(registrationData.phone)) {
+      errors.lastName = "Please enter valid phonr number."
+    }
+    if (registrationData.qualification === 'Other') {
+      if (registrationData.otherQualification.trim() === '') {
+        errors.otherQualification = 'Please enter qualification.'
+      }
+    }
+    if (registrationData.areasOfExpertise.length < 1) {
+      errors.areasOfExpertise = 'Please enter at least one expertise.'
+    }
+    if (!passwordRegex.test(registrationData.password)) {
+      errors.password = 'Please enter valid password.'
+    }
+    if (!passwordRegex.test(tempData.confirmPassword)) {
+      errors.confirmPassword = 'Please enter valid password.'
+    }
+    if (passwordRegex.test(tempData.confirmPassword) && registrationData.password !== tempData.confirmPassword) {
+      errors.confirmPassword = 'Both password should be same.'
+    }
+    if (!pincodeRegex.test(registrationData.pincode)) {
+      errors.pincode = 'Please enter valid pincode.'
     }
     console.log(errors)
-    setRegistrationErrors(prevData=>({...prevData,...errors}))
+    setRegistrationErrors(prevData => ({ ...prevData, ...errors }))
     console.log(registrationErrors)
   }
   // Function to push allergies array of registrationData
@@ -158,6 +184,7 @@ export default function PatientRegistration() {
             value={registrationData.lastName}
             required
           />
+          {registrationErrors.lastName && <small className="error--message">{registrationErrors.lastName}</small>}
         </div>
 
         <div>
@@ -173,7 +200,6 @@ export default function PatientRegistration() {
 
         <div >
           <p className="registration__gender">Gender</p>
-          <label htmlFor="male">Male</label>
           <input
             id="male"
             type="radio"
@@ -181,8 +207,8 @@ export default function PatientRegistration() {
             value="male"
             checked={registrationData.gender === "male"}
             onChange={handleChange}
-          /><br />
-          <label htmlFor="female">Female</label>
+          />
+          <label htmlFor="male">Male</label><br />
           <input
             id="female"
             type="radio"
@@ -191,12 +217,12 @@ export default function PatientRegistration() {
             checked={registrationData.gender === "female"}
             onChange={handleChange}
           />
-
+          <label htmlFor="female">Female</label>
         </div>
         <div>
           <label htmlFor="phone" className="registration__label">Phone Number</label>
           <input
-            type="text"
+            type="number"
             name="phone"
             id="phone"
             className="registration__input"
@@ -293,6 +319,7 @@ export default function PatientRegistration() {
             onChange={handleChange}
             value={registrationData.otherQualification}
           />
+          {registrationErrors.otherQualification && <small className="error--message">{registrationErrors.otherQualification}</small>}
         </div>
 
         <div>
@@ -303,6 +330,7 @@ export default function PatientRegistration() {
             id="qualificationYear"
             className="registration__input"
             onChange={handleChange}
+            required
             min="1900"
             max={`${new Date().getFullYear()}`}
             value={registrationData.qualificationYear} />
@@ -323,6 +351,7 @@ export default function PatientRegistration() {
           {expertiseArray.length > 0 && <div className="registration__expertise__display grid--column--extended">
             {expertiseArray}
           </div>}
+          {registrationErrors.areasOfExpertise && <small className="error--message">{registrationErrors.areasOfExpertise}</small>}
         </div>
         <div className="registration__expertise__btn">
           <button type="button"
@@ -353,7 +382,7 @@ export default function PatientRegistration() {
             value={registrationData.password}
             required
           />
-
+          {registrationErrors.password && <small className="error--message">{registrationErrors.password}</small>}
         </div>
         <div>
 
@@ -367,6 +396,7 @@ export default function PatientRegistration() {
             value={tempData.confirmPassword}
             required
           />
+          {registrationErrors.confirmPassword && <small className="error--message">{registrationErrors.confirmPassword}</small>}
         </div>
 
         {/* Address */}
@@ -461,6 +491,7 @@ export default function PatientRegistration() {
             value={registrationData.addreess.pincode}
             required
           />
+          {registrationErrors.pincode && <small className="error--message">{registrationErrors.pincode}</small>}
         </div>
         <div className="grid--column--extended"><button type="submit" className="registration__btn btn--submit">Submit</button></div>
       </form>
