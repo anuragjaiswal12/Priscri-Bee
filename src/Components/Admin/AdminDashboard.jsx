@@ -1,7 +1,7 @@
 import DashbordCard from "../Ui/DashbordCards";
 import DasboardBoady from "../Ui/DashboardBody";
 import React, { useState } from 'react';
-import { auth, db } from '../auth/firebaseAuth';
+import { db } from '../../auth/firebaseAuth';
 import { collection, getDocs } from 'firebase/firestore';
 import "../../css/Admin.css"
 
