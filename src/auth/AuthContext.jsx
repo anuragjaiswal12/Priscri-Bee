@@ -99,10 +99,10 @@ const AuthProvider = ({ children }) => {
         }
       }).catch((err) => {
         if (err.message === 'Firebase: Error (auth/user-not-found).') {
-          console.log('please create account first');
+          alert('Please sign up first');
         }
         else if (err.message === 'Firebase: Error (auth/wrong-password).') {
-          console.log('wrong password');
+          alert('Please enter correct password');
         }
       });
   };
