@@ -1,7 +1,8 @@
 import DashbordCard from "../Ui/DashbordCards";
 import DasboardBoady from "../Ui/DashboardBody";
 import React, { useState } from 'react';
-
+import { auth, db } from '../auth/firebaseAuth';
+import { collection, getDocs } from 'firebase/firestore';
 import "../../css/Admin.css"
 
 
@@ -11,6 +12,12 @@ function AdminDashbord() {
         varifiedDoctorsList:false
     })
     // Pending Doctors array of Obj
+    async function getAllPendingDoctor(){
+        const pendingDoctorCollectionRef = collection(db, 'pendingDoctorCollection');
+        const pendingDoctorSnapshot = await getDocs(pendingDoctorCollectionRef);
+        const allPendingDoctor=pendingDoctorSnapshot.docs.map((doc)=>doc.data());
+        return allPendingDoctor;
+    }
     return (  
         <div className="admin-container main--container">
             <div className="admin__header__cards">
