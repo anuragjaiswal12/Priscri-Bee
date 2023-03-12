@@ -50,12 +50,31 @@ function AdminDashbord() {
     }, []);
     
     return (  
-        <div className="admin-container main--container">
+        <div className="main--container admin-container">
             <div className="admin__header__cards">
-                <DashbordCard header="Pending Doctors" value={16} type="one" handleSelect={()=>handleSelect("pendingDoctorsList")}/>
-                <DashbordCard header="Varified Doctors" value={16} type="two" handleSelect={()=>handleSelect("varifiedDoctorsList")}/>
-                <DashbordCard header="Total Patient" value={16} type="one" handleSelect={()=>handleSelect("totalPatientInfo")}/>
-                <DashbordCard header="Total Doctors" value={16} type="two"handleSelect={()=>handleSelect("instights")}/>
+                <DashbordCard 
+                header="Pending Doctors" 
+                value={16} type="one" 
+                isSelected = {elementState.pendingDoctorsList}
+                handleSelect={()=>handleSelect("pendingDoctorsList")}/>
+
+                <DashbordCard 
+                header="Varified Doctors" 
+                value={16} type="two" 
+                isSelected = {elementState.varifiedDoctorsList}
+                handleSelect={()=>handleSelect("varifiedDoctorsList")}/>
+
+                <DashbordCard 
+                header="Total Patient" 
+                value={16} type="one" 
+                isSelected = {elementState.totalPatientInfo}
+                handleSelect={()=>handleSelect("totalPatientInfo")}/>
+
+                <DashbordCard 
+                header="Total Doctors" 
+                value={16} type="two"
+                isSelected = {elementState.instights}
+                handleSelect={()=>handleSelect("instights")}/>
             </div>
             <div className="admin__dashboard__body">
                 {/* {elementState.pendingDoctorsList && (myData.gotPendingDoctorsArray ? <DasboardBody pendingDoctorsArray={pendingDoctorsArray}/> : <div className="dashboard__loader">Loading</div>)} */}
