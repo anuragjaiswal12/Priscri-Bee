@@ -2,12 +2,12 @@ import React from "react"
 import { useNavigate } from "react-router-dom"
 import { Footer } from "../../Utils/Footer"
 import "../../css/Login.css"
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from '../../auth/firebaseAuth';
+import { AuthContext} from "../../auth/AuthContext";
+import { useContext } from "react";
 import 'firebase/firestore';
-import { collection, getDocs } from 'firebase/firestore';
 
 export default function PatientLogin() {
+    const { login } = useContext(AuthContext)
     const navigate = useNavigate()
     const [formData, setFormData] = React.useState(
         {
@@ -15,7 +15,6 @@ export default function PatientLogin() {
             password: "",
         }
     )
-
     function handleChange(event) {
         const { name, value } = event.target
         setFormData(prevFormData => {
@@ -28,34 +27,7 @@ export default function PatientLogin() {
 
     function handleSubmit(event) {
         event.preventDefault();
-        signInWithEmailAndPassword(auth, formData.email, formData.password).then(
-            async (res) => {
-                console.log(`Login success.Welcome ${res.user.displayName}`);
-                const patientCollectionRef = collection(db, 'patientCollection');
-                const snapshot = await getDocs(patientCollectionRef);
-                let isPatient = false;
-                snapshot.docs.map((doc) => {
-                    if (doc.get('email') == res.user.email) {
-                        isPatient = true;
-                    }
-                });
-                if (!isPatient) {
-                    console.log('No user found');
-                    await auth.signOut();
-                }
-                else {
-                    console.log('Patient found');
-                }
-                // console.log(`Login success.Welcome ${res.user.displayName}`)
-            }
-        ).catch((err) => {
-            if (err.message === 'Firebase: Error (auth/user-not-found).') {
-                console.log('please create account first');
-            }
-            else if (err.message === 'Firebase: Error (auth/wrong-password).') {
-                console.log('wrong password');
-            }
-        });
+        login(formData.email,formData.password,"patient")
     }
 
     return (

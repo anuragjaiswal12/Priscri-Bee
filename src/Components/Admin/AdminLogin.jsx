@@ -20,12 +20,16 @@ export default function AdminLogin() {
             }
         })
     }
+    function handleSubmit(event) {
+        event.preventDefault();
+        login(formData.email,formData.password,"admin")
+    }
     return (
         <div className="doctor-login main--container">
             <div className="login__container width--auto" >
                 <div className="login__card">
                     <h1 className="login__form__header --header">Welcome Back Admin :)</h1>
-                    <form className="login__form">
+                    <form className="login__form" onSubmit={handleSubmit}>
                         <input
                             type="email"
                             placeholder="Email"

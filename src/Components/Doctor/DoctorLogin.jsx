@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import "../../css/Login.css"
 import { Footer } from "../../Utils/Footer"
 import { AuthContext, AuthProvider } from "../../auth/AuthContext";
-import 'firebase/firestore';
 
 export default function DoctorLogin() {
     const navigate = useNavigate()
@@ -25,7 +24,7 @@ export default function DoctorLogin() {
         const { login } = useContext(AuthContext);  
         function handleSubmit(event) {
         event.preventDefault();
-        login("anurag.d.j174414@gmail.com","Anurag1234@","doctor")
+        login(formData.email,formData.password,"doctor")
     }
     return (
         <div className="doctor-login main--container">

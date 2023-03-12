@@ -5,9 +5,9 @@ export default function DoctorDashboard(){
     const { user, logout ,login } = useContext(AuthContext);
     return(
     <>
-        {/* {
+        {
             user !== "Doctor" ? <Navigate to="/Doctor-Login" /> : <div className="main-container">This is doctor's dashboard</div>
-        } */}
+        } 
     </>
     )
 }
