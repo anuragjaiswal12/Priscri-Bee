@@ -15,7 +15,7 @@ function AdminDashbord() {
     instights: false,
   })
   const [myData, setMyData] = useState({
-    gotPendingDoctorsArray: false,
+    pendingDoctorsArray: false,
   })
   function handleSelect(key) {
     for (const prop in elementState) {
@@ -33,26 +33,24 @@ function AdminDashbord() {
     }
   }
   // Pending Doctors array of Obj
-  let pendingDoctorsArray = null;
 
   async function getAllPendingDoctor() {
     const pendingDoctorCollectionRef = collection(db, 'pendingDoctorCollection');
     const pendingDoctorSnapshot = await getDocs(pendingDoctorCollectionRef);
     const allPendingDoctor = pendingDoctorSnapshot.docs.map((doc) => doc.data());
-    pendingDoctorsArray = allPendingDoctor;
-    setMyData(pervData => ({ ...pervData, gotPendingDoctorsArray: true }));
+    setMyData(pervData => ({ ...pervData, pendingDoctorsArray: allPendingDoctor }));
   }
-
-  function getSelectedArrayElements(key, value) {
-    console.log("elementSelected: ", key, "value: ", value)
-  }
-
+  
   useEffect(() => {
-    if (!pendingDoctorsArray) {
+    if (!myData.pendingDoctorsArray) {
       getAllPendingDoctor();
     }
   }, []);
 
+  function getSelectedArrayElements(key, value) {
+    console.log("elementSelected: ", key, "value: ", value)
+  }
+    
   return (
     <div className="main--container admin-container">
       <div className="admin__header__cards">
@@ -82,8 +80,7 @@ function AdminDashbord() {
       </div>
       <div className="admin__dashboard__body">
         <DasboardFilter getSelectedArrayElements={getSelectedArrayElements} />
-        {/* {elementState.pendingDoctorsList && (myData.gotPendingDoctorsArray ? <DasboardBody pendingDoctorsArray={pendingDoctorsArray}/> : <div className="dashboard__loader">Loading</div>)} */}
-        {elementState.pendingDoctorsList && <DashboardBodyOfList testArray={testArray} />}
+        {elementState.pendingDoctorsList && (myData.pendingDoctorsArray ? <DashboardBodyOfList pendingDoctorsArray={myData.pendingDoctorsArray}/> : <div className="dashboard__loader">Loading</div>)}
         {elementState.varifiedDoctorsList && <div>Varified doctors</div>}
         {elementState.totalPatientInfo && <div>Total Patient</div>}
         {elementState.instights && <div>Insights</div>}

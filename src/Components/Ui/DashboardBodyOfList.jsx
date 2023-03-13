@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 
 function DashboardBodyOfList(props) {
     const [selectedElemnet, setSelectedElemnet] = useState(null)
-
-    const elementsArray = props.testArray.map((item, index) => (
+    console.log(props)
+    const elementsArray = props.pendingDoctorsArray.map((item, index) => (
         <div
             className="dashboard__body__elements"
             onClick={() => extendElements(index)}
