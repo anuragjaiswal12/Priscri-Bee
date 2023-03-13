@@ -8,6 +8,7 @@ function DashboardBodyOfList(props) {
         <div
             className="dashboard__body__elements"
             onClick={() => extendElements(index)}
+            key={index}
         >
             <div className="dashboard__body__fullName">Doctors Name :  {item.firstName + " " + item.lastName}</div>
             <div className="dashboard__body__Qualification">Qualification : {item.qualification}</div>

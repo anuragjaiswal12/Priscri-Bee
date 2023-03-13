@@ -22,12 +22,13 @@ function DasboardFilter(props) {
         selectedFiter === key ? setSelectedFilter(null) : setSelectedFilter(key)
     }
 
-    const fiterArray = Object.keys(item).map(item => {
+    const fiterArray = Object.keys(item).map((item,index) => {
         return (
             <div
                 className="dashboard__filter__elements"
                 onClick={() => updateSelectedFilter(item)}
                 style={{ "backgroundColor": selectedFiter === item ? "#a2ff8e" : "#badded" }}
+                key = {index}
             >
                 {`${item}`}
             </div>
