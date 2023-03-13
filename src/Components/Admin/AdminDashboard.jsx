@@ -8,82 +8,70 @@ import "../../css/Admin.css"
 import { testArray } from "../../Utils/testData";
 
 function AdminDashbord() {
-  const [elementState, setElementsState] = useState({
-    pendingDoctorsList: true,
-    varifiedDoctorsList: false,
-    totalPatientInfo: false,
-    instights: false,
-  })
-  const [myData, setMyData] = useState({
-    pendingDoctorsArray: false,
-  })
-  function handleSelect(key) {
-    for (const prop in elementState) {
-      if (prop === key) {
-        setElementsState(prevState => ({
-          ...prevState,
-          [prop]: true
-        }));
-      } else {
-        setElementsState(prevState => ({
-          ...prevState,
-          [prop]: false
-        }));
-      }
-    }
-  }
-  // Pending Doctors array of Obj
+  console.log("Admin Dashboard Rendered")
+  
+  // State to keep track of the selected element from dashboard
+  const [selectedElement, setSelectedElement] = useState("pendingDoctorsList")
 
+  // State to keep track of incoming data from server
+  const [myData, setMyData] = useState({ pendingDoctorsArray: false, })
+
+  // Function to handle the selected element from dashboard and update state based on it
+  function handleSelect(key) {
+    setSelectedElement(key)
+  }
+  // Function to get array of all penfing doctor data from server
   async function getAllPendingDoctor() {
     const pendingDoctorCollectionRef = collection(db, 'pendingDoctorCollection');
     const pendingDoctorSnapshot = await getDocs(pendingDoctorCollectionRef);
     const allPendingDoctor = pendingDoctorSnapshot.docs.map((doc) => doc.data());
     setMyData(pervData => ({ ...pervData, pendingDoctorsArray: allPendingDoctor }));
   }
-  
+
   useEffect(() => {
     if (!myData.pendingDoctorsArray) {
       getAllPendingDoctor();
     }
   }, []);
 
+  // Function to get selected filter 
   function getSelectedArrayElements(key, value) {
     console.log("elementSelected: ", key, "value: ", value)
   }
-    
+
   return (
     <div className="main--container admin-container">
       <div className="admin__header__cards">
         <DashbordCard
           header="Pending Doctors"
           value={16} type="one"
-          isSelected={elementState.pendingDoctorsList}
+          isSelected={selectedElement.pendingDoctorsList}
           handleSelect={() => handleSelect("pendingDoctorsList")} />
 
         <DashbordCard
           header="Varified Doctors"
           value={16} type="two"
-          isSelected={elementState.varifiedDoctorsList}
+          isSelected={selectedElement.varifiedDoctorsList}
           handleSelect={() => handleSelect("varifiedDoctorsList")} />
 
         <DashbordCard
           header="Total Patient"
           value={16} type="one"
-          isSelected={elementState.totalPatientInfo}
+          isSelected={selectedElement.totalPatientInfo}
           handleSelect={() => handleSelect("totalPatientInfo")} />
 
         <DashbordCard
           header="Total Doctors"
           value={16} type="two"
-          isSelected={elementState.instights}
+          isSelected={selectedElement.instights}
           handleSelect={() => handleSelect("instights")} />
       </div>
       <div className="admin__dashboard__body">
         <DasboardFilter getSelectedArrayElements={getSelectedArrayElements} />
-        {elementState.pendingDoctorsList && (myData.pendingDoctorsArray ? <DashboardBodyOfList pendingDoctorsArray={myData.pendingDoctorsArray}/> : <div className="dashboard__loader">Loading</div>)}
-        {elementState.varifiedDoctorsList && <div>Varified doctors</div>}
-        {elementState.totalPatientInfo && <div>Total Patient</div>}
-        {elementState.instights && <div>Insights</div>}
+        {selectedElement === "pendingDoctorsList" && (myData.pendingDoctorsArray ? <DashboardBodyOfList pendingDoctorsArray={myData.pendingDoctorsArray} /> : <div className="dashboard__loader">Loading</div>)}
+        {selectedElement === "varifiedDoctorsList" && <div>Varified doctors</div>}
+        {selectedElement === "totalPatientInfo" && <div>Total Patient</div>}
+        {selectedElement === "instights" && <div>Insights</div>}
       </div>
     </div>
   );
